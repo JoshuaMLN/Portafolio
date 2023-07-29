@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from bson import ObjectId
+from typing import List, Dict
 
 from db.models.user import UserAdmin
 from db.client import db_client
@@ -19,7 +20,7 @@ router = APIRouter(prefix="/admin",
 
 
 # Obtener la lista de usuarios con contraseña
-@router.get("/show", response_model = list[dict], status_code= status.HTTP_200_OK)
+@router.get("/show", response_model = List[Dict], status_code= status.HTTP_200_OK)
 async def show_users():
     return admins_schema(db_client.users.find())
 
