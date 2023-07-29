@@ -1,6 +1,0 @@
-Este en un Proyecto de Backend hecho en Python utilizando la herramienta FastAPI.
-Es un proyecto simple en donde los clientes puedes registrarse como usuarios y posteriormente ingresar por un login.
-Este proyecto se encuentra desplegado en Deta Space(https://deta.space/discovery/r/s7z1vdeub1tbwdjb) y utiliza una base de datos noSQL - MongoDB.
-Este proyecto se desarrollo en Visual Studio Code.
-
-Para poder ver las diferentes API´s que tiene el proyecto debera agregar un /docs al final del link que obtuviste al descargar mi proyecto de Deta Space
