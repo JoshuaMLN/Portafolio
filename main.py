@@ -21,14 +21,14 @@ app.mount("/front", StaticFiles(directory="static/front"), name="front")
 # Utilizamos Jinja2Templates para renderizar las páginas HTML
 templates = Jinja2Templates(directory="front")
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, tags=["Redirect"])
 async def read_root():
     return RedirectResponse(url="/front/login.html")
 
-@app.get("/front/login.html", response_class=HTMLResponse)
+@app.get("/front/login.html", response_class=HTMLResponse, tags=["Frontend"])
 async def read_login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-@app.get("/front/register.html", response_class=HTMLResponse)
+@app.get("/front/register.html", response_class=HTMLResponse, tags=["Frontend"])
 async def read_register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
