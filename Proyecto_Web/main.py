@@ -6,7 +6,7 @@ from starlette.responses import RedirectResponse
 from routers import me, access, admin
 
 app=FastAPI()
-
+# Prueba con VisualCode
 # uvicorn main:app --reload
 # http://127.0.0.1:8000
 
