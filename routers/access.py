@@ -21,7 +21,7 @@ router = APIRouter(prefix="/access",
                    tags=["Access"],
                    responses={
                         status.HTTP_404_NOT_FOUND: {
-                            "message": "No se encontro la página"
+                            "message": "No se encontro la página."
                             }
                        }
                     )
@@ -33,10 +33,10 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     # Buscamos si existe el usuario
     user = search_user("username", form.username)
     if type(user) is not UserAdmin:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="El usuario no es correcto")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="El usuario no es correcto.")
     # Verificamos si la contraseña es correcta
     if not crypt.verify(form.password, user.password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="La contraseña no es correcta")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="La contraseña no es correcta.")
     token = generate_token(user.username, user.admin)
     # Retornamos el token
     return {"access_token": token, "token_type": "bearer"}
@@ -55,7 +55,7 @@ async def add_user(user: User):
     user_dict["password"] = crypt.encrypt(user.password)
     # Mongodb le asigna un id al usuario y lo añadimos a la bd
     db_client.users.insert_one(user_dict).inserted_id
-    mensaje: str = "Usuario creado exitosamente"
+    mensaje: str = "Usuario creado exitosamente."
     # Buscamos el usuario creado y retornamos
     return {"mensaje": mensaje}
 
@@ -105,13 +105,13 @@ def validate_user_creation(user: User):
     if type(search_user("username", user.username)) == UserAdmin:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail = "Nombre de usuario ya registrado"
+            detail = "Nombre de usuario ya registrado."
             )
     #  Con respecto a su email
     if type(search_user("email", user.email)) == UserAdmin:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail = "Email ya registrado"
+            detail = "Email ya registrado."
             )
     
 def search_user(field: str, key):
@@ -129,7 +129,7 @@ def search_user(field: str, key):
 async def auth_user(token : str = Depends(oauth2)):
     exception = HTTPException(
              status_code=status.HTTP_401_UNAUTHORIZED,
-             detail="Credenciales de autenticación inválidas", 
+             detail="Credenciales de autenticación inválidas.", 
              headers={"WWW_Authenticate": "Bearer"})
     try:
         username = jwt.decode(token, SECRET, algorithms=ALGORITHM).get("sub")
@@ -144,7 +144,7 @@ async def auth_user(token : str = Depends(oauth2)):
     if user.disabled:
         raise HTTPException(
              status_code=status.HTTP_400_BAD_REQUEST,
-             detail="Usuario Inactivo")
+             detail="Usuario Inactivo.")
     
     return user
 
@@ -152,5 +152,5 @@ async def auth_admin(user: UserAdmin = Depends(auth_user)):
     if user.admin == False:
         raise HTTPException(
              status_code=status.HTTP_401_UNAUTHORIZED,
-             detail="Credenciales de autenticación como administrador inválidas", 
+             detail="Credenciales de autenticación como administrador inválidas.", 
              headers={"WWW_Authenticate": "Bearer"})

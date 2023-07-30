@@ -41,6 +41,11 @@
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
+                    <div class="text-center mt-3" id="loading-indicator" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -71,7 +76,7 @@
                     "username": username,
                     "password": password
                 };
-
+                $("#loading-indicator").show();
                 $.ajax({
                     type: "POST",
                     url: URL + "/access/register",
@@ -82,11 +87,25 @@
                         const successMessage = response.mensaje;
                         $("#success-message").text(successMessage).removeClass("d-none").addClass("alert alert-success");
                         $("#error-message").addClass("d-none");
+                        setTimeout(function() {
+                            $("#loading-indicator").show();
+                        }, 100);
+                        setTimeout(function() {
+                            $("#loading-indicator").hide();
+                            $("#success-message").addClass("d-none");
+                            window.location.replace("login.html");
+                        }, 3000);
                     },
                     error: function(xhr, textStatus, error) {
                         const errorMessage = xhr.responseJSON.detail;
                         $("#error-message").text(errorMessage).removeClass("d-none");
                         $("#success-message").addClass("d-none");
+                        setTimeout(function() {
+                            $("#error-message").addClass("d-none");
+                        }, 5000);
+                    },
+                    complete: function() {
+                        $("#loading-indicator").hide();
                     }
                 });
             });

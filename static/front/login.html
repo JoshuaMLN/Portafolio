@@ -35,6 +35,11 @@
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
+                    <div class="text-center mt-3" id="loading-indicator" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -56,6 +61,7 @@
             });
             $("#login-form").on("submit", function(event) {
                 event.preventDefault();
+                $("#loading-indicator").show();
                 const username = $("#username").val();
                 const password = $("#password").val();
                 const data = {
@@ -72,11 +78,22 @@
                         const token = response.access_token;
                         $("#token-message").text(`Token: ${token}`).removeClass("d-none").addClass("alert alert-success");
                         $("#error-message").addClass("d-none");
+
+                        setTimeout(function() {
+                            $("#token-message").addClass("d-none");
+                        }, 5000);
                     },
                     error: function(xhr, textStatus, error) {
                         const errorMessage = xhr.responseJSON.detail;
                         $("#error-message").text(errorMessage).removeClass("d-none");
                         $("#token-message").addClass("d-none");
+
+                        setTimeout(function() {
+                            $("#error-message").addClass("d-none");
+                        }, 5000);
+                    },
+                    complete: function() {
+                        $("#loading-indicator").hide();
                     }
                 });
             });
