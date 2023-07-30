@@ -37,6 +37,8 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     # Verificamos si la contraseña es correcta
     if not crypt.verify(form.password, user.password):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="La contraseña no es correcta.")
+    if user.disabled == True:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Usuario desactivado temporalmente. Pongase en contacto con el administrador.")
     token = generate_token(user.username, user.admin)
     # Retornamos el token
     return {"access_token": token, "token_type": "bearer"}
@@ -78,6 +80,8 @@ def generate_token(username: str, admin: bool):
 def traducir_error(error_message: str):
     error_punto = "The part after the @-sign is not valid. It should have a period."
     error_dominio = "The domain name"
+    error_email_largo = "The email address is too long before the @-sign"
+    error_dominio_superior = "The part after the @-sign is not valid. It is not within a valid top-level domain."
 
     if error_punto in error_message:
         error_message = "La parte que sigue al signo @ no es válida. Debe tener un punto."
@@ -86,7 +90,16 @@ def traducir_error(error_message: str):
         patron = r"(\b(?:\w+\.)+\w+\b)"
         coincidencias = re.search(patron, error_message)
         error_message = "El dominio " + coincidencias.group() + " no existe."
-        
+
+    if error_email_largo in error_message:
+        patron = r"\((\d+)"
+        coincidencias = re.search(patron, error_message)
+        if coincidencias:
+            error_message = "La dirección de correo electrónico es demasiado larga antes del signo @ " + coincidencias.group() +" carácteres de más)"
+
+    if error_dominio_superior in error_message:
+        error_message = "La parte que sigue al signo @ no es válida. No está dentro de un dominio de nivel superior válido."
+
     return error_message
 
 def validate_email(email: str):
@@ -95,7 +108,7 @@ def validate_email(email: str):
     except EmailNotValidError as e:
         error_message = traducir_error(str(e))
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=error_message
         )
 
@@ -129,23 +142,16 @@ def search_user(field: str, key):
 async def auth_user(token : str = Depends(oauth2)):
     exception = HTTPException(
              status_code=status.HTTP_401_UNAUTHORIZED,
-             detail="Credenciales de autenticación inválidas.", 
+             detail="Su sesión expiró. Inicie sesión nuevamente.", 
              headers={"WWW_Authenticate": "Bearer"})
     try:
         username = jwt.decode(token, SECRET, algorithms=ALGORITHM).get("sub")
         if username is None:
             raise exception
-        
     except JWTError:
         raise exception
     
     user = search_user("username", username)
-
-    if user.disabled:
-        raise HTTPException(
-             status_code=status.HTTP_400_BAD_REQUEST,
-             detail="Usuario Inactivo.")
-    
     return user
 
 async def auth_admin(user: UserAdmin = Depends(auth_user)):

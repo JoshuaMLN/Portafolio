@@ -23,12 +23,16 @@ templates = Jinja2Templates(directory="front")
 
 @app.get("/", response_class=HTMLResponse, tags=["Redirect"])
 async def read_root():
-    return RedirectResponse(url="/front/login.html")
+    return RedirectResponse(url="/front/access/login.html")
 
 @app.get("/front/login.html", response_class=HTMLResponse, tags=["Frontend"])
 async def read_login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("access/login.html", {"request": request})
 
 @app.get("/front/register.html", response_class=HTMLResponse, tags=["Frontend"])
 async def read_register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse("access/register.html", {"request": request})
+
+@app.get("/front/me/profile.html", response_class=HTMLResponse, tags=["Frontend"])
+async def read_profile_page(request: Request):
+    return templates.TemplateResponse("me/profile.html", {"request": request})
