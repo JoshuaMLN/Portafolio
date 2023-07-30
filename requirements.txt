@@ -6,3 +6,4 @@ pymongo
 python-multipart
 bcrypt
 Jinja2
+email-validator

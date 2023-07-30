@@ -3,9 +3,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from email_validator import validate_email as validar_correo, EmailNotValidError
+import re
 
 from db.models.user import User, UserAdmin
-from db.schemas.user import user_schema, admin_schema
+from db.schemas.user import admin_schema
 from db.client import db_client
 
 ALGORITHM = "HS256"
@@ -42,6 +44,7 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
 # Registrar un usuario
 @router.post("/register", response_model = dict, status_code=status.HTTP_201_CREATED)
 async def add_user(user: User):
+    validate_email(user.email)
     # Validamos los datos del usuario a crear
     validate_user_creation(user)
     # Creamos el usuario sin el id
@@ -52,8 +55,9 @@ async def add_user(user: User):
     user_dict["password"] = crypt.encrypt(user.password)
     # Mongodb le asigna un id al usuario y lo añadimos a la bd
     db_client.users.insert_one(user_dict).inserted_id
+    mensaje: str = "Usuario creado exitosamente"
     # Buscamos el usuario creado y retornamos
-    return {"message": "Usuario creado exitosamente"}
+    return {"mensaje": mensaje}
 
 
 
@@ -71,6 +75,29 @@ def generate_token(username: str, admin: bool):
     # Retornamos el token codificado
     return jwt.encode(access_token, SECRET, algorithm=ALGORITHM)
 
+def traducir_error(error_message: str):
+    error_punto = "The part after the @-sign is not valid. It should have a period."
+    error_dominio = "The domain name"
+
+    if error_punto in error_message:
+        error_message = "La parte que sigue al signo @ no es válida. Debe tener un punto."
+
+    if error_dominio in error_message:
+        patron = r"(\b(?:\w+\.)+\w+\b)"
+        coincidencias = re.search(patron, error_message)
+        error_message = "El dominio " + coincidencias.group() + " no existe."
+        
+    return error_message
+
+def validate_email(email: str):
+    try:
+        validar_correo(email,check_deliverability=True)
+    except EmailNotValidError as e:
+        error_message = traducir_error(str(e))
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=error_message
+        )
 
 def validate_user_creation(user: User):
     # Comprobamos que no cause conflicto con otros usuarios
