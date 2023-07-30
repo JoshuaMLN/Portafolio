@@ -55,6 +55,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
+        let errorTimeout, sucessTimeout, loadingTimeout;
         $(document).ready(function() {
             $("#togglePasswordBtn").on("click", function() {
                 const passwordInput = $("#password");
@@ -76,6 +77,11 @@
                     "username": username,
                     "password": password
                 };
+                clearTimeout(sucessTimeout);
+                clearTimeout(errorTimeout);
+                clearTimeout(loadingTimeout);
+                $("#success-message").addClass("d-none");
+                $("#error-message").addClass("d-none");
                 $("#loading-indicator").show();
                 $.ajax({
                     type: "POST",
@@ -87,10 +93,10 @@
                         const successMessage = response.mensaje;
                         $("#success-message").text(successMessage).removeClass("d-none").addClass("alert alert-success");
                         $("#error-message").addClass("d-none");
-                        setTimeout(function() {
+                        loadingTimeout = setTimeout(function() {
                             $("#loading-indicator").show();
                         }, 100);
-                        setTimeout(function() {
+                        sucessTimeout = setTimeout(function() {
                             $("#loading-indicator").hide();
                             $("#success-message").addClass("d-none");
                             window.location.replace("login.html");
@@ -100,7 +106,7 @@
                         const errorMessage = xhr.responseJSON.detail;
                         $("#error-message").text(errorMessage).removeClass("d-none");
                         $("#success-message").addClass("d-none");
-                        setTimeout(function() {
+                        errorTimeout = setTimeout(function() {
                             $("#error-message").addClass("d-none");
                         }, 5000);
                     },
