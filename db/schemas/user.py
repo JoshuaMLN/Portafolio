@@ -4,12 +4,13 @@ def user_schema(user):
     if type(user) == UserAdmin:
         return {
                 "username": user.username,
-                "email":    user.email
+                "email":    user.email,
+                "birthdate": user.birthdate
                 }
     return {
-            
             "username": str(user["username"]),
-            "email":    str(user["email"])
+            "email":    str(user["email"]),
+            "birthdate": str(user["birthdate"])
             }
 
 def admin_schema(user):
@@ -18,6 +19,7 @@ def admin_schema(user):
                 "username": user.username,
                 "password": user.password,
                 "email":    user.email,
+                "birthdate": user.birthdate,
                 "disabled": user.disabled,
                 "admin":    user.admin
                 }
@@ -26,6 +28,7 @@ def admin_schema(user):
             "username": str(user["username"]),
             "password": str(user["password"]),
             "email":    str(user["email"]),
+            "birthdate": str(user["birthdate"]),
             "disabled": bool(user["disabled"]),
             "admin":    bool(user["admin"])
             }

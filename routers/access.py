@@ -5,6 +5,7 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from email_validator import validate_email as validar_correo, EmailNotValidError
 import re
+from datetime import date
 
 from db.models.user import User, UserAdmin
 from db.schemas.user import admin_schema
@@ -33,10 +34,10 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     # Buscamos si existe el usuario
     user = search_user("username", form.username)
     if type(user) is not UserAdmin:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="El usuario no es correcto.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="El usuario no existe.")
     # Verificamos si la contraseña es correcta
     if not crypt.verify(form.password, user.password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="La contraseña no es correcta.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="La contraseña es incorrecta.")
     if user.disabled == True:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Usuario desactivado temporalmente. Pongase en contacto con el administrador.")
     token = generate_token(user.username, user.admin)
@@ -46,8 +47,9 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
 # Registrar un usuario
 @router.post("/register", response_model = dict, status_code=status.HTTP_201_CREATED)
 async def add_user(user: User):
-    validate_email(user.email)
     # Validamos los datos del usuario a crear
+    validate_email(user.email)
+    user.birthdate = validate_birthday(user.birthdate)
     validate_user_creation(user)
     # Creamos el usuario sin el id
     user_dict = dict(user)
@@ -55,6 +57,7 @@ async def add_user(user: User):
     user_dict.setdefault("admin", False)
     # Encriptamos la contraseña
     user_dict["password"] = crypt.encrypt(user.password)
+    user_dict["birthdate"] = str(user_dict["birthdate"])
     # Mongodb le asigna un id al usuario y lo añadimos a la bd
     db_client.users.insert_one(user_dict).inserted_id
     mensaje: str = "Usuario creado exitosamente."
@@ -111,6 +114,16 @@ def validate_email(email: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=error_message
         )
+    
+def validate_birthday(birthdate: str):
+    fecha_nacimiento = datetime.strptime(birthdate, "%Y-%m-%d").date()
+    fecha_actual = date.today()
+    edad = fecha_actual.year - fecha_nacimiento.year - ((fecha_actual.month, fecha_actual.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    if edad < 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= "Debes de ser mayor de 10 años para poder registrarte.")
+    return fecha_nacimiento.strftime("%d-%m-%Y")
 
 def validate_user_creation(user: User):
     # Comprobamos que no cause conflicto con otros usuarios

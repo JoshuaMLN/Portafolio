@@ -33,6 +33,10 @@
                             </button>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="birthdate" class="form-label">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                    </div>
                     <div class="d-flex justify-content-between">
                         <a href="login.html" class="btn btn-secondary ml-auto">
                             <i class="fas fa-arrow-left"></i> Volver
@@ -70,10 +74,12 @@
                 const email = $("#email").val();
                 const username = $("#username").val();
                 const password = $("#password").val();
+                const birthdate =$("#birthdate").val();
                 const data = {
                     "email": email,
                     "username": username,
-                    "password": password
+                    "password": password,
+                    "birthdate": birthdate
                 };
                 clearTimeout(sucessTimeout);
                 clearTimeout(errorTimeout);
