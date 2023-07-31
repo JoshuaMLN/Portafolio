@@ -11,7 +11,7 @@
     <div class="container mt-5">
         <div class="row align-items-center">
             <div class="col-md-12 d-flex justify-content-end">
-                <button class="btn btn-primary btn-sm" id="logout-btn">
+                <button class="btn btn-danger btn-sm" id="logout-btn">
                     <i class="fas fa-door-open ml-1"></i> Cerrar Sesión
                 </button>
             </div>
@@ -22,12 +22,17 @@
         <div class="row justify-content-center mt-4">
             <div class="col-md-7 text-center">
                 <div class="table-responsive">
+                    <style>
+                        caption {
+                            caption-side: top;
+                        }
+                    </style>
                     <table class="table mt-4 table-sm text-center">
-                        <caption>Información de usuario</caption>
+                        <caption>Mi información:</caption>
                         <thead>
                             <tr>
-                                <th scope="col" class="w-auto">Campo</th>
-                                <th scope="col" class="w-auto">Valor</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody id="profile-table-body">
@@ -38,34 +43,39 @@
         </div>
     </div>
     <script>
-        const URL = window.location.origin; // Replace this with your API's URL
+        const URL = window.location.origin;
 
-        // Function to show error and redirect to login page
         function showErrorAndRedirect(errorMessage) {
             alert(errorMessage);
             localStorage.removeItem("access_token");
             window.location.href = "../access/login.html";
         }
 
-        // Function to display profile data in the table
         function displayProfileData(data) {
             const tableBody = document.getElementById("profile-table-body");
+            let campo = "null";
             for (const [key, value] of Object.entries(data)) {
+                switch(key){
+                    case "username":
+                        campo = "Nombre de Usuario";
+                        break;
+                    case "email":
+                        campo = "Correo Electrónico";
+                        break;
+                }
                 const row = `<tr>
-                                <td>${key}</td>
-                                <td>${value}</td>
+                                <td style="text-align: right;"><strong>${campo} :</td>
+                                <td style="text-align: left;"><span style="margin-left: 20px;">${value}</span></td>
                             </tr>`;
                 tableBody.innerHTML += row;
             }
         }
 
-        // Function to handle logout button click
         function handleLogout() {
             localStorage.removeItem("access_token");
             window.location.href = "../access/login.html";
         }
 
-        // Function to fetch profile data from the API
         async function fetchProfileData() {
             try {
                 const token = localStorage.getItem("access_token");
@@ -86,7 +96,6 @@
             }
         }
 
-        // Function to check if the user is logged in (has a token)
         function checkLoggedIn() {
             const token = localStorage.getItem("access_token");
             if (!token) {
@@ -96,11 +105,9 @@
             }
         }
 
-        // Attach event listener to logout button
         const logoutBtn = document.getElementById("logout-btn");
         logoutBtn.addEventListener("click", handleLogout);
 
-        // On page load, check if the user is logged in and fetch profile data
         checkLoggedIn();
     </script>
 </body>
