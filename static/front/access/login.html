@@ -49,7 +49,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        let errorTimeout, sucessTimeout;
+        let errorTimeout;
         $(document).ready(function() {
             $("#togglePasswordBtn").on("click", function() {
                 const passwordInput = $("#password");
@@ -68,7 +68,6 @@
                     "username": username,
                     "password": password
                 };
-                clearTimeout(sucessTimeout);
                 clearTimeout(errorTimeout);
                 $("#token-message").addClass("d-none");
                 $("#error-message").addClass("d-none");
