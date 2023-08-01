@@ -6,6 +6,7 @@ class User(BaseModel):
     username: str
     password: str
     birthdate: str
+    gender: str
 
 class UserAdmin(User):
     id: Optional[str] = "Null"

@@ -5,12 +5,14 @@ def user_schema(user):
         return {
                 "username": user.username,
                 "email":    user.email,
-                "birthdate": user.birthdate
+                "birthdate": user.birthdate,
+                "gender": user.gender
                 }
     return {
             "username": str(user["username"]),
             "email":    str(user["email"]),
-            "birthdate": str(user["birthdate"])
+            "birthdate": str(user["birthdate"]),
+             "gender":    str(user["gender"])
             }
 
 def admin_schema(user):
@@ -19,6 +21,7 @@ def admin_schema(user):
                 "username": user.username,
                 "password": user.password,
                 "email":    user.email,
+                "gender": user.gender,
                 "birthdate": user.birthdate,
                 "disabled": user.disabled,
                 "admin":    user.admin
@@ -28,6 +31,7 @@ def admin_schema(user):
             "username": str(user["username"]),
             "password": str(user["password"]),
             "email":    str(user["email"]),
+            "gender":    str(user["gender"]),
             "birthdate": str(user["birthdate"]),
             "disabled": bool(user["disabled"]),
             "admin":    bool(user["admin"])

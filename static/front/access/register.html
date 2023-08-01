@@ -37,6 +37,15 @@
                         <label for="birthdate" class="form-label">Fecha de Nacimiento</label>
                         <input type="date" class="form-control" id="birthdate" name="birthdate" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">Género</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="" disabled selected>Selecciona una opción</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="No Binario">No Binario</option>
+                        </select>
+                    </div>
                     <div class="d-flex justify-content-between">
                         <a href="login.html" class="btn btn-secondary ml-auto">
                             <i class="fas fa-arrow-left"></i> Volver
@@ -75,11 +84,13 @@
                 const username = $("#username").val();
                 const password = $("#password").val();
                 const birthdate =$("#birthdate").val();
+                const gender =$("#gender").val();
                 const data = {
                     "email": email,
                     "username": username,
                     "password": password,
-                    "birthdate": birthdate
+                    "birthdate": birthdate,
+                    "gender": gender
                 };
                 clearTimeout(sucessTimeout);
                 clearTimeout(errorTimeout);
